@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: terraform-bot
+
+server:
+  port: 9080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  config: "classpath:log4j2.yml"
+
+path: ${FOLDER_PATH}
+terraform:
+  awsAccessKeyId: ${KEY_ID}
+  awsSecretAccessKey: ${ACCESS_KEY}
