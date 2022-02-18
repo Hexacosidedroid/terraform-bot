@@ -40,6 +40,16 @@
             <artifactId>telegrambots-spring-boot-starter</artifactId>
             <version>${telegrambot.version}</version>
         </dependency>
+        <!--Database-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.20</version>
+        </dependency>
         <!--Kotlin-->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

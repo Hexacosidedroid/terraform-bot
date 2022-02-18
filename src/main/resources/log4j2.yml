@@ -16,7 +16,7 @@ Configutation:
 
     File:
       name: File_Appender
-      fileName: ${log-path}/ruben-bot.log
+      fileName: ${log-path}/terraform-bot.log
       PatternLayout:
         pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
 
