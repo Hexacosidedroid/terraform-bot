@@ -1,10 +1,13 @@
 package ru.cib.terraformbot.service
 
 import mu.KotlinLogging
+import org.apache.tomcat.util.net.AprEndpoint.Sendfile
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
+import org.telegram.telegrambots.meta.api.objects.InputFile
 import org.telegram.telegrambots.meta.api.objects.Update
 import java.util.*
 
@@ -32,15 +35,27 @@ class BotService(
                 val message = update.message
                 val chatId = message.chatId
                 logger.debug("[$sessionGuid] Chat started for id: $chatId")
-                val response = when (message.text) {
-                    "/start" -> "Welcome! This bot designed for create VM's"
-                    "/help" -> "create, destroy"
-                    "/create" -> processor.create(chatId)
-                    "/destroy" -> processor.destroy(chatId)
-                    else -> "Enter /help for commands"
+                when (message.text) {
+                    "/start" -> {
+                        execute(SendMessage("$chatId", "Welcome! This bot designed for VM's creation"))
+                    }
+                    "/help" -> {
+                        execute(SendMessage("$chatId", "/create - create new instance, /destroy - destroy current instance"))
+                    }
+                    "/create" -> {
+                        val response = processor.create(chatId)
+                        execute(SendMessage("$chatId", response.first))
+                        execute(SendDocument("$chatId", InputFile(response.second)))
+                    }
+                    "/destroy" -> {
+                        val response = processor.destroy(chatId)
+                        execute(SendMessage("$chatId", response))
+                    }
+                    else -> {
+                        execute(SendMessage("$chatId", "Enter /help for commands"))
+                    }
                 }
                 logger.debug("[$sessionGuid] Forming response message and sending back")
-                execute(SendMessage("$chatId", response))
             } else
                 throw Exception("Message is empty!!!")
         } catch (e: Exception) {

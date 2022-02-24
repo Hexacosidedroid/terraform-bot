@@ -14,35 +14,41 @@ private val logger = KotlinLogging.logger {}
 
 @Service
 class Processor(
+    @Value("\${path-terraform}")
+    private val terraformPath: String? = null,
     private val terraformConfig: TerraformConfig,
-    private val sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository,
+    private val rsa: RsaGenerator,
+    private val terraform: TerraformFileGenerator
 ) {
-    @Value("\${path}")
-    private val path: String? = null
 
-    fun create(chatId: Long): String {
-        //TODO generate new directory with terraform files
-        val ip = execCreate(path!!)
-        val result = sessionRepository.save(Session().apply {
+    fun create(chatId: Long): Pair<String, File> {
+        val session = sessionRepository.save(Session().apply {
             this.chatId = chatId
-            this.status = true
-            this.path = path
-            this.privateKey = ""
-            this.ip = ip
+            this.status = false
+            this.path = terraformPath + chatId
         })
-        return result.ip!!
+        terraform.createDir(session.path!!)
+        val keyPair = rsa.generate(session.path!!)
+        terraform.create(keyPair.first, session.path!!)
+        val ip = execCreate(session.path!!)
+        sessionRepository.save(session.apply {
+            this.status = true
+            this.ip = ip
+            this.privateKey = keyPair.first
+            this.publicKey = keyPair.second.readText()
+        })
+        return Pair("$ip - started", keyPair.second)
     }
 
     fun destroy(chatId: Long): String {
-        val session = sessionRepository.findByChatId(chatId)
-        execDestroy(path!!)
+        val session = sessionRepository.findByChatIdAndStatus(chatId, true)
+        execDestroy(session.path!!)
         val result = sessionRepository.save(session.apply {
             this.status = false
         })
-        return result.ip!!
+        return "${result.ip!!} - destroyed"
     }
-
-//    private fun formFiles() {}
 
     private fun execCreate(path: String): String {
         val ip = mutableListOf<String>()
@@ -52,7 +58,7 @@ class Processor(
             client.plan().get()
             client.apply().get()
         }
-        return ip[0]
+        return ip.last()
     }
 
     private fun execDestroy(path: String): String {
@@ -62,20 +68,20 @@ class Processor(
             client.workingDirectory = File(path)
             client.destroy().get()
         }
-        return ip[0]
+        return ip.last()
     }
 
     private fun clientConfiguration(client: TerraformClient, ip: MutableList<String>) = client.apply {
         outputListener = Consumer {
             logger.debug(it)
-            if (it.contains("Public IP")) {
-                ip.add(it)
+            if (it.contains("public_id")) {
+                ip.add(it.replace(Regex("[^0-9.]"), ""))
             }
         }
         errorListener = Consumer {
             logger.debug(it)
-            if (it.contains("Public IP")) {
-                ip.add(it)
+            if (it.contains("public_id")) {
+                ip.add(it.replace(Regex("[^0-9.]"), ""))
             }
         }
     }
