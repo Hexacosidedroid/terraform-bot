@@ -1,9 +1,26 @@
 spring:
   application:
     name: terraform-bot
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgresql://${DB_URL}:5432/${DB_NAME}"
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        enable_lazy_load_no_trans: true
+        current_session_context_class: thread
+    hibernate:
+      ddl-auto: update
 
 server:
   port: 9080
+
+logging:
+  config: "classpath:log4j2.yml"
 
 management:
   endpoints:
@@ -11,10 +28,10 @@ management:
       exposure:
         include: "*"
 
-logging:
-  config: "classpath:log4j2.yml"
-
-path: ${FOLDER_PATH}
+path-terraform: "C:\\Users\\Honor\\IdeaProjects\\terraform-bot\\src\\main\\resources\\"
 terraform:
   awsAccessKeyId: ${KEY_ID}
   awsSecretAccessKey: ${ACCESS_KEY}
+bot:
+  name: ${BOT_NAME}
+  token: ${BOT_TOKEN}
