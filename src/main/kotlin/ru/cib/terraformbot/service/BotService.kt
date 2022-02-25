@@ -1,7 +1,6 @@
 package ru.cib.terraformbot.service
 
 import mu.KotlinLogging
-import org.apache.tomcat.util.net.AprEndpoint.Sendfile
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
@@ -43,9 +42,11 @@ class BotService(
                         execute(SendMessage("$chatId", "/create - create new instance, /destroy - destroy current instance"))
                     }
                     "/create" -> {
+                        execute(SendMessage("$chatId", "Generating started"))
                         val response = processor.create(chatId)
                         execute(SendMessage("$chatId", response.first))
-                        execute(SendDocument("$chatId", InputFile(response.second)))
+                        execute(SendDocument("$chatId", InputFile(response.second.first)))
+                        execute(SendDocument("$chatId", InputFile(response.second.second)))
                     }
                     "/destroy" -> {
                         val response = processor.destroy(chatId)

@@ -38,19 +38,20 @@ class TerraformFileGenerator(
             file.mkdir()
     }
 
-    fun create(privateKey: String, path: String) {
-        val templates = terraformTemplate.findById(1).get()
-        createKeyPair(path, privateKey, templates.keyPair)
-        createMain(path, templates.main)
-        createSecurity(path, templates.security)
+    fun create(publicKey: String, path: String, chatId: String) {
+        val templates = terraformTemplate.findById(3).get()
+        createKeyPair(path, publicKey, templates.keyPair, chatId)
+        createMain(path, templates.main, chatId)
+        createSecurity(path, templates.security, chatId)
         createVariable(path, templates.variable)
         createProvider(path, templates.provider)
         createOutput(path, templates.output)
     }
 
-    private fun createMain(path: String, main: String?) {
+    private fun createMain(path: String, main: String?, chatId: String) {
         val file = File("$path${fileSeparator}main.tf")
-        file.writeText(main!!, Charsets.UTF_8)
+        val mainReplaced = main!!.replace("-id", "-$chatId")
+        file.writeText(mainReplaced, Charsets.UTF_8)
     }
 
     private fun createVariable(path: String, variable: String?) {
@@ -68,14 +69,19 @@ class TerraformFileGenerator(
         file.writeText(output!!, Charsets.UTF_8)
     }
 
-    private fun createKeyPair(path: String, privateKey: String, keyPair: String?) {
+    private fun createKeyPair(path: String, publicKey: String, keyPair: String?, chatId: String) {
         val file = File("$path${fileSeparator}key_pair.tf")
-        val keyPairReplaced = keyPair!!.replace("placeholder", privateKey, true)
+        val publicKeyReplaced = publicKey.replace("\n", "")
+            .replace("\r", "")
+            .replace("\t", "")
+        val keyPairReplaced = keyPair!!.replace("pkey", publicKeyReplaced)
+            .replace("-id", "-$chatId")
         file.writeText(keyPairReplaced, Charsets.UTF_8)
     }
 
-    private fun createSecurity(path: String, security: String?) {
+    private fun createSecurity(path: String, security: String?, chatId: String) {
         val file = File("$path${fileSeparator}security.tf")
-        file.writeText(security!!, Charsets.UTF_8)
+        val securityReplaced = security!!.replace("-id", "-$chatId")
+        file.writeText(securityReplaced, Charsets.UTF_8)
     }
 }

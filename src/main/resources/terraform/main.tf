@@ -8,5 +8,5 @@ resource "aws_instance" "ssh" {
     Name = "terraform-ssh"
   }
 
-  key_name = "ssh-key"
+  key_name = "ssh-key-id"
 }

@@ -1,5 +1,5 @@
 resource "aws_security_group" "ssh" {
-  name = "ssh-instance"
+  name = "ssh-instance-id"
   ingress {
     from_port = var.ssh_port
     to_port = var.ssh_port

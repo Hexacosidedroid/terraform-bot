@@ -15,7 +15,7 @@ class RsaGenerator(
     private val fileSeparator: String? = null,
 ) {
 
-    fun generate(path: String): Pair<String, File> {
+    fun generate(path: String): Pair<File, File> {
         logger.info("Starting to create Key Pair")
         val privateKey = "$path${fileSeparator}id_rsa"
         val publicKey = "$path${fileSeparator}id_rsa.pub"
@@ -31,8 +31,8 @@ class RsaGenerator(
         return getKeys(path)
     }
 
-    private fun getKeys(path: String): Pair<String, File> {
-        val privateKey = File("$path${fileSeparator}id_rsa").readText()
+    private fun getKeys(path: String): Pair<File, File> {
+        val privateKey = File("$path${fileSeparator}id_rsa")
         val publicKey = File("$path${fileSeparator}id_rsa.pub")
         return Pair(privateKey, publicKey)
     }

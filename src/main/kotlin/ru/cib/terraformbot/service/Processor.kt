@@ -30,15 +30,15 @@ class Processor(
         })
         terraform.createDir(session.path!!)
         val keyPair = rsa.generate(session.path!!)
-        terraform.create(keyPair.first, session.path!!)
+        terraform.create(keyPair.second.readText(), session.path!!, "$chatId")
         val ip = execCreate(session.path!!)
         sessionRepository.save(session.apply {
             this.status = true
             this.ip = ip
-            this.privateKey = keyPair.first
+            this.privateKey = keyPair.first.readText()
             this.publicKey = keyPair.second.readText()
         })
-        return Pair("$ip - started", keyPair.second)
+        return Pair("$ip - started", keyPair.first)
     }
 
     fun destroy(chatId: Long): String {
