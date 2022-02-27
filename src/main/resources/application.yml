@@ -28,7 +28,7 @@ management:
       exposure:
         include: "*"
 
-path-terraform: "C:\\Users\\Honor\\IdeaProjects\\terraform-bot\\src\\main\\resources\\"
+path-terraform: "/opt/terraform"
 terraform:
   awsAccessKeyId: ${KEY_ID}
   awsSecretAccessKey: ${ACCESS_KEY}
