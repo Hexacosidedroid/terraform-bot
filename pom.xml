@@ -10,7 +10,7 @@
     </parent>
     <groupId>ru.cib</groupId>
     <artifactId>terraform-bot</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>terraform-bot</name>
     <description>terraform-bot</description>
 
@@ -127,6 +127,23 @@
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <from>
+                        <image>fabric8/java-alpine-openjdk11-jre:1.9.0</image>
+                    </from>
+                    <to>
+                        <auth>
+                            <username>${env.USERNAME_DOCKER}</username>
+                            <password>${env.PASSWORD_DOCKER}</password>
+                        </auth>
+                        <image>docker.io/hexacosidedroid/terraform-bot:${version}</image>
+                    </to>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

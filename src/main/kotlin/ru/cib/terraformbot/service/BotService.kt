@@ -45,10 +45,10 @@ class BotService(
                         execute(SendMessage("$chatId", "Generating started"))
                         val response = processor.create(chatId)
                         execute(SendMessage("$chatId", response.first))
-                        execute(SendDocument("$chatId", InputFile(response.second.first)))
-                        execute(SendDocument("$chatId", InputFile(response.second.second)))
+                        execute(SendDocument("$chatId", InputFile(response.second)))
                     }
                     "/destroy" -> {
+                        execute(SendMessage("$chatId", "Destroying started"))
                         val response = processor.destroy(chatId)
                         execute(SendMessage("$chatId", response))
                     }
